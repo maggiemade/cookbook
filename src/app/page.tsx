@@ -11,7 +11,7 @@ import {
   X,
   BookOpen,
 } from "lucide-react";
-import { Recipe, RecipeCategory, RecipeType, SortField, SortOrder } from "@/types";
+import { Recipe, RecipeCategory, SortField, SortOrder } from "@/types";
 
 const CATEGORIES: { value: RecipeCategory | ""; label: string }[] = [
   { value: "", label: "All" },
@@ -24,28 +24,6 @@ const CATEGORIES: { value: RecipeCategory | ""; label: string }[] = [
   { value: "drinks", label: "Drinks" },
   { value: "other", label: "Other" },
 ];
-
-const TYPES: { value: RecipeType | ""; label: string }[] = [
-  { value: "", label: "All types" },
-  { value: "original", label: "My recipes" },
-  { value: "adapted", label: "Adapted" },
-  { value: "reference", label: "Reference" },
-  { value: "saved", label: "Saved" },
-];
-
-const TYPE_COLORS: Record<RecipeType, string> = {
-  original: "#4a9278",
-  adapted: "#7a8fa6",
-  reference: "#5a82a0",
-  saved: "#7a82b0",
-};
-
-const TYPE_BG: Record<RecipeType, string> = {
-  original: "var(--sage-light)",
-  adapted: "var(--neutral-light)",
-  reference: "var(--sky-light)",
-  saved: "var(--lavender-light)",
-};
 
 const CATEGORY_EMOJI: Record<RecipeCategory, string> = {
   breakfast: "🍳",
@@ -61,8 +39,8 @@ const CATEGORY_EMOJI: Record<RecipeCategory, string> = {
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<RecipeCategory | "">("");
-  const [type, setType] = useState<RecipeType | "">("");
+  const [category, setCategory] = useState<RecipeCategory | "">("" );
+  const [showInspiration, setShowInspiration] = useState(false);
   const [sortField, setSortField] = useState<SortField>("updated_at");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [showFilters, setShowFilters] = useState(false);
@@ -73,25 +51,25 @@ export default function RecipesPage() {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (category) params.set("category", category);
-    if (type) params.set("type", type);
+    if (showInspiration) params.set("type", "inspiration");
     params.set("sortField", sortField);
     params.set("sortOrder", sortOrder);
     const res = await fetch(`/api/recipes?${params}`);
     const data = await res.json();
     setRecipes(data);
     setLoading(false);
-  }, [search, category, type, sortField, sortOrder]);
+  }, [search, category, showInspiration, sortField, sortOrder]);
 
   useEffect(() => {
     const t = setTimeout(fetchRecipes, 200);
     return () => clearTimeout(t);
   }, [fetchRecipes]);
 
-  const hasFilters = !!(search || category || type || sortField !== "updated_at");
+  const hasFilters = !!(search || category || showInspiration || sortField !== "updated_at");
   const clearFilters = () => {
     setSearch("");
     setCategory("");
-    setType("");
+    setShowInspiration(false);
     setSortField("updated_at");
     setSortOrder("desc");
   };
@@ -158,25 +136,7 @@ export default function RecipesPage() {
             className="rounded-xl p-4 mb-4 space-y-3 border"
             style={{ background: "var(--card)", borderColor: "var(--border)" }}
           >
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs font-medium block mb-1" style={{ color: "var(--text-muted)" }}>
-                  Type
-                </label>
-                <div className="relative">
-                  <select
-                    value={type}
-                    onChange={(e) => setType(e.target.value as RecipeType | "")}
-                    className="w-full text-sm px-3 py-2 pr-8 rounded-lg border appearance-none outline-none"
-                    style={{ borderColor: "var(--border)", background: "var(--bg)", color: "var(--text)" }}
-                  >
-                    {TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
-                </div>
-              </div>
+            <div className="flex gap-3 items-end">
               <div className="flex-1">
                 <label className="text-xs font-medium block mb-1" style={{ color: "var(--text-muted)" }}>
                   Sort by
@@ -202,6 +162,17 @@ export default function RecipesPage() {
                   <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
                 </div>
               </div>
+              <button
+                onClick={() => setShowInspiration(!showInspiration)}
+                className="px-3 py-2 rounded-lg border text-sm font-medium transition-colors"
+                style={{
+                  borderColor: showInspiration ? "var(--lavender)" : "var(--border)",
+                  background: showInspiration ? "var(--lavender-light)" : "var(--bg)",
+                  color: "var(--text)",
+                }}
+              >
+                Inspiration only
+              </button>
             </div>
           </div>
         )}
@@ -258,7 +229,7 @@ export default function RecipesPage() {
                 ) : (
                   <div
                     className="w-20 h-20 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                    style={{ background: TYPE_BG[recipe.type] }}
+                    style={{ background: "var(--neutral-light)" }}
                   >
                     {CATEGORY_EMOJI[recipe.category]}
                   </div>
@@ -268,15 +239,14 @@ export default function RecipesPage() {
                     <h3 className="font-semibold text-sm leading-snug" style={{ color: "var(--text)" }}>
                       {recipe.title}
                     </h3>
-                    <span
-                      className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium capitalize"
-                      style={{
-                        background: TYPE_BG[recipe.type],
-                        color: TYPE_COLORS[recipe.type],
-                      }}
-                    >
-                      {recipe.type === "original" ? "mine" : recipe.type}
-                    </span>
+                    {recipe.type === "inspiration" && (
+                      <span
+                        className="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: "var(--lavender-light)", color: "var(--lavender)" }}
+                      >
+                        Inspiration
+                      </span>
+                    )}
                   </div>
                   {recipe.description && (
                     <p className="text-xs mt-1 line-clamp-2" style={{ color: "var(--text-muted)" }}>

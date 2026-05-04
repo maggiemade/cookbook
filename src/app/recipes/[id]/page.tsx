@@ -13,21 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Nav from "@/components/Nav";
-import { Recipe, RecipeType } from "@/types";
-
-const TYPE_BG: Record<RecipeType, string> = {
-  original: "var(--sage-light)",
-  adapted: "var(--neutral-light)",
-  reference: "var(--sky-light)",
-  saved: "var(--lavender-light)",
-};
-
-const TYPE_LABEL: Record<RecipeType, string> = {
-  original: "My recipe",
-  adapted: "Adapted",
-  reference: "Reference",
-  saved: "Saved",
-};
+import { Recipe } from "@/types";
 
 export default function RecipeDetailPage({
   params,
@@ -178,12 +164,14 @@ export default function RecipeDetailPage({
               <h1 className="text-2xl font-bold leading-snug" style={{ color: "var(--text)" }}>
                 {recipe.title}
               </h1>
-              <span
-                className="shrink-0 mt-1 px-3 py-1 rounded-full text-xs font-medium"
-                style={{ background: TYPE_BG[recipe.type], color: "var(--text)" }}
-              >
-                {TYPE_LABEL[recipe.type]}
-              </span>
+              {recipe.type === "inspiration" && (
+                <span
+                  className="shrink-0 mt-1 px-3 py-1 rounded-full text-xs font-medium"
+                  style={{ background: "var(--lavender-light)", color: "var(--lavender)" }}
+                >
+                  Inspiration
+                </span>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2">
