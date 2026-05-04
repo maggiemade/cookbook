@@ -1,32 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #fdf8f3;
+  --bg: #f3f6f8;
   --card: #ffffff;
-  --rose: #f4a7b9;
-  --rose-light: #fde8ef;
-  --sage: #a8c5a0;
-  --sage-light: #e8f3e6;
-  --lavender: #c4b5e0;
-  --lavender-light: #ede8f8;
-  --peach: #f5c8a0;
-  --peach-light: #fdf0e4;
-  --sky: #a8d4e6;
-  --sky-light: #e4f3f9;
-  --text: #3d3531;
-  --text-muted: #8c7b75;
-  --border: #e8ddd8;
+  --primary: #6d8fa6;
+  --primary-light: #dde8f0;
+  --sage: #7aaa94;
+  --sage-light: #ddeee7;
+  --lavender: #8e9bbf;
+  --lavender-light: #e4e8f5;
+  --neutral: #9eaab5;
+  --neutral-light: #eaecee;
+  --sky: #72aac2;
+  --sky-light: #d9ecf5;
+  --text: #28353f;
+  --text-muted: #6b7d8c;
+  --border: #d2dde6;
 }
 
 body {
   background-color: var(--bg);
   color: var(--text);
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100dvh;
-}
-
-input, textarea, select, button {
-  font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
 * {

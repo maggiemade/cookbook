@@ -25,7 +25,7 @@ const TYPES: { value: RecipeType; label: string; desc: string }[] = [
 
 const TYPE_COLORS: Record<RecipeType, string> = {
   original: "var(--sage-light)",
-  adapted: "var(--peach-light)",
+  adapted: "var(--neutral-light)",
   reference: "var(--sky-light)",
   saved: "var(--lavender-light)",
 };
@@ -128,7 +128,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
               onClick={() => setType(t.value)}
               className="text-left p-3 rounded-xl border transition-all"
               style={{
-                borderColor: type === t.value ? "var(--rose)" : "var(--border)",
+                borderColor: type === t.value ? "var(--primary)" : "var(--border)",
                 background: type === t.value ? TYPE_COLORS[t.value] : "var(--card)",
               }}
             >
@@ -163,8 +163,8 @@ export default function RecipeForm({ initial, recipeId }: Props) {
               onClick={() => setCategory(c)}
               className="px-3 py-1 rounded-full text-xs font-medium border capitalize transition-colors"
               style={{
-                borderColor: category === c ? "var(--rose)" : "var(--border)",
-                background: category === c ? "var(--rose-light)" : "var(--card)",
+                borderColor: category === c ? "var(--primary)" : "var(--border)",
+                background: category === c ? "var(--primary-light)" : "var(--card)",
                 color: "var(--text)",
               }}
             >
@@ -198,8 +198,8 @@ export default function RecipeForm({ initial, recipeId }: Props) {
               onClick={() => setSourceType(sourceType === s ? "" : s)}
               className="px-3 py-1 rounded-full text-xs border"
               style={{
-                borderColor: sourceType === s ? "var(--rose)" : "var(--border)",
-                background: sourceType === s ? "var(--rose-light)" : "var(--card)",
+                borderColor: sourceType === s ? "var(--primary)" : "var(--border)",
+                background: sourceType === s ? "var(--primary-light)" : "var(--card)",
                 color: "var(--text)",
               }}
             >
@@ -287,7 +287,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
             <div key={i} className="flex gap-2 items-start">
               <span
                 className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-2"
-                style={{ background: "var(--rose-light)", color: "var(--rose)" }}
+                style={{ background: "var(--primary-light)", color: "var(--primary)" }}
               >
                 {i + 1}
               </span>
@@ -344,7 +344,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
           placeholder="What I changed, what worked, what to try next time..."
           rows={3}
           className="w-full text-sm px-3 py-2 rounded-xl border outline-none resize-none"
-          style={{ ...inputStyle, background: "var(--peach-light)" }}
+          style={{ ...inputStyle, background: "var(--neutral-light)" }}
         />
       </div>
 
@@ -365,7 +365,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
         type="submit"
         disabled={saving || !title.trim()}
         className="w-full py-3 rounded-2xl font-semibold text-white disabled:opacity-50 transition-opacity"
-        style={{ background: "var(--rose)" }}
+        style={{ background: "var(--primary)" }}
       >
         {saving ? "Saving..." : recipeId ? "Save changes" : "Add recipe"}
       </button>

@@ -68,8 +68,8 @@ export default function PhotoUpload({ photos, onChange, maxPhotos = 5 }: Props) 
           {...getRootProps()}
           className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-dashed cursor-pointer transition-colors"
           style={{
-            borderColor: isDragActive ? "var(--rose)" : "var(--border)",
-            background: isDragActive ? "var(--rose-light)" : "transparent",
+            borderColor: isDragActive ? "var(--primary)" : "var(--border)",
+            background: isDragActive ? "var(--primary-light)" : "transparent",
           }}
         >
           <input {...getInputProps()} />
