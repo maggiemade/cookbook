@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Plus,
-  Trash2,
-  GripVertical,
-  ChevronDown,
-} from "lucide-react";
+import { Plus, Trash2, GripVertical } from "lucide-react";
 import { Recipe, RecipeCategory, RecipeType, Ingredient, Step, SourceType } from "@/types";
 import PhotoUpload from "./PhotoUpload";
 import TagInput from "./TagInput";
@@ -15,20 +10,6 @@ import TagInput from "./TagInput";
 const CATEGORIES: RecipeCategory[] = [
   "breakfast", "lunch", "dinner", "dessert", "snack", "bread", "drinks", "other",
 ];
-
-const TYPES: { value: RecipeType; label: string; desc: string }[] = [
-  { value: "original", label: "My recipe", desc: "Something I created myself" },
-  { value: "adapted", label: "Adapted", desc: "Based on another recipe with my changes" },
-  { value: "reference", label: "Reference", desc: "A recipe I use as-is" },
-  { value: "saved", label: "Saved", desc: "Saved for reading / inspiration" },
-];
-
-const TYPE_COLORS: Record<RecipeType, string> = {
-  original: "var(--sage-light)",
-  adapted: "var(--neutral-light)",
-  reference: "var(--sky-light)",
-  saved: "var(--lavender-light)",
-};
 
 interface Props {
   initial?: Partial<Recipe>;
@@ -41,7 +22,7 @@ const emptyStep = (order: number): Step => ({ order, text: "" });
 export default function RecipeForm({ initial, recipeId }: Props) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title || "");
-  const [type, setType] = useState<RecipeType>(initial?.type || "original");
+  const [isInspiration, setIsInspiration] = useState(initial?.type === "inspiration");
   const [category, setCategory] = useState<RecipeCategory>(initial?.category || "other");
   const [description, setDescription] = useState(initial?.description || "");
   const [sourceType, setSourceType] = useState<SourceType | "">(initial?.source_type || "");
@@ -57,20 +38,18 @@ export default function RecipeForm({ initial, recipeId }: Props) {
   const [myNotes, setMyNotes] = useState(initial?.my_notes || "");
   const [tags, setTags] = useState<string[]>(initial?.tags || []);
   const [photos, setPhotos] = useState<string[]>(initial?.photos || []);
-
   const [saving, setSaving] = useState(false);
 
-  const updateIngredient = (i: number, field: keyof Ingredient, val: string) => {
+  const updateIngredient = (i: number, field: keyof Ingredient, val: string) =>
     setIngredients((prev) => prev.map((ing, idx) => idx === i ? { ...ing, [field]: val } : ing));
-  };
   const addIngredient = () => setIngredients((p) => [...p, emptyIngredient()]);
   const removeIngredient = (i: number) => setIngredients((p) => p.filter((_, idx) => idx !== i));
 
-  const updateStep = (i: number, val: string) => {
+  const updateStep = (i: number, val: string) =>
     setSteps((prev) => prev.map((s, idx) => idx === i ? { ...s, text: val } : s));
-  };
   const addStep = () => setSteps((p) => [...p, emptyStep(p.length + 1)]);
-  const removeStep = (i: number) => setSteps((p) => p.filter((_, idx) => idx !== i).map((s, idx) => ({ ...s, order: idx + 1 })));
+  const removeStep = (i: number) =>
+    setSteps((p) => p.filter((_, idx) => idx !== i).map((s, idx) => ({ ...s, order: idx + 1 })));
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +58,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
     try {
       const body = {
         title: title.trim(),
-        type,
+        type: (isInspiration ? "inspiration" : "recipe") as RecipeType,
         category,
         description: description.trim() || undefined,
         source_type: sourceType || undefined,
@@ -92,14 +71,9 @@ export default function RecipeForm({ initial, recipeId }: Props) {
         tags,
         photos,
       };
-
       const url = recipeId ? `/api/recipes/${recipeId}` : "/api/recipes";
       const method = recipeId ? "PATCH" : "POST";
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
       router.push(`/recipes/${data.id}`);
     } finally {
@@ -107,37 +81,11 @@ export default function RecipeForm({ initial, recipeId }: Props) {
     }
   };
 
-  const inputStyle = {
-    borderColor: "var(--border)",
-    background: "var(--card)",
-    color: "var(--text)",
-  };
-
+  const inputStyle = { borderColor: "var(--border)", background: "var(--card)", color: "var(--text)" };
   const labelStyle = { color: "var(--text-muted)" };
 
   return (
     <form onSubmit={handleSave} className="space-y-6 pb-8">
-      {/* Recipe type */}
-      <div>
-        <label className="text-xs font-medium mb-2 block" style={labelStyle}>Recipe type</label>
-        <div className="grid grid-cols-2 gap-2">
-          {TYPES.map((t) => (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => setType(t.value)}
-              className="text-left p-3 rounded-xl border transition-all"
-              style={{
-                borderColor: type === t.value ? "var(--primary)" : "var(--border)",
-                background: type === t.value ? TYPE_COLORS[t.value] : "var(--card)",
-              }}
-            >
-              <div className="text-sm font-medium" style={{ color: "var(--text)" }}>{t.label}</div>
-              <div className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{t.desc}</div>
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Title */}
       <div>
@@ -151,6 +99,33 @@ export default function RecipeForm({ initial, recipeId }: Props) {
           style={inputStyle}
         />
       </div>
+
+      {/* Inspiration toggle */}
+      <button
+        type="button"
+        onClick={() => setIsInspiration(!isInspiration)}
+        className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border text-left transition-colors"
+        style={{
+          borderColor: isInspiration ? "var(--lavender)" : "var(--border)",
+          background: isInspiration ? "var(--lavender-light)" : "var(--card)",
+        }}
+      >
+        <div
+          className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+          style={{
+            borderColor: isInspiration ? "var(--lavender)" : "var(--border)",
+            background: isInspiration ? "var(--lavender)" : "transparent",
+          }}
+        >
+          {isInspiration && (
+            <div className="w-2 h-2 rounded-full bg-white" />
+          )}
+        </div>
+        <div>
+          <div className="text-sm font-medium" style={{ color: "var(--text)" }}>Mark as Inspiration</div>
+          <div className="text-xs" style={{ color: "var(--text-muted)" }}>A recipe I want to try or learn from</div>
+        </div>
+      </button>
 
       {/* Category */}
       <div>
@@ -258,12 +233,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
                 className="flex-1 text-sm px-2 py-2 rounded-lg border outline-none"
                 style={inputStyle}
               />
-              <button
-                type="button"
-                onClick={() => removeIngredient(i)}
-                className="shrink-0"
-                style={{ color: "var(--text-muted)" }}
-              >
+              <button type="button" onClick={() => removeIngredient(i)} className="shrink-0" style={{ color: "var(--text-muted)" }}>
                 <Trash2 size={14} />
               </button>
             </div>
@@ -299,12 +269,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
                 className="flex-1 text-sm px-3 py-2 rounded-xl border outline-none resize-none"
                 style={inputStyle}
               />
-              <button
-                type="button"
-                onClick={() => removeStep(i)}
-                className="mt-2 shrink-0"
-                style={{ color: "var(--text-muted)" }}
-              >
+              <button type="button" onClick={() => removeStep(i)} className="mt-2 shrink-0" style={{ color: "var(--text-muted)" }}>
                 <Trash2 size={14} />
               </button>
             </div>
@@ -335,9 +300,7 @@ export default function RecipeForm({ initial, recipeId }: Props) {
 
       {/* My Notes */}
       <div>
-        <label className="text-xs font-medium mb-1 block" style={labelStyle}>
-          My notes & edits
-        </label>
+        <label className="text-xs font-medium mb-1 block" style={labelStyle}>My notes & edits</label>
         <textarea
           value={myNotes}
           onChange={(e) => setMyNotes(e.target.value)}
