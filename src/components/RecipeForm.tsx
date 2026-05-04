@@ -1,17 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Loader2,
   Plus,
   Trash2,
   GripVertical,
   ChevronDown,
-  Link2,
-  Type,
-  Camera,
-  Sparkles,
 } from "lucide-react";
 import { Recipe, RecipeCategory, RecipeType, Ingredient, Step, SourceType } from "@/types";
 import PhotoUpload from "./PhotoUpload";
@@ -35,8 +30,6 @@ const TYPE_COLORS: Record<RecipeType, string> = {
   saved: "var(--lavender-light)",
 };
 
-type ParseMode = "url" | "photo" | "text" | null;
-
 interface Props {
   initial?: Partial<Recipe>;
   recipeId?: string;
@@ -47,8 +40,6 @@ const emptyStep = (order: number): Step => ({ order, text: "" });
 
 export default function RecipeForm({ initial, recipeId }: Props) {
   const router = useRouter();
-  const fileRef = useRef<HTMLInputElement>(null);
-
   const [title, setTitle] = useState(initial?.title || "");
   const [type, setType] = useState<RecipeType>(initial?.type || "original");
   const [category, setCategory] = useState<RecipeCategory>(initial?.category || "other");
@@ -68,51 +59,6 @@ export default function RecipeForm({ initial, recipeId }: Props) {
   const [photos, setPhotos] = useState<string[]>(initial?.photos || []);
 
   const [saving, setSaving] = useState(false);
-  const [parseMode, setParseMode] = useState<ParseMode>(null);
-  const [parseInput, setParseInput] = useState("");
-  const [parsing, setParsing] = useState(false);
-  const [parseError, setParseError] = useState("");
-
-  const parseRecipe = async (payload: Record<string, string>) => {
-    setParsing(true);
-    setParseError("");
-    try {
-      const res = await fetch("/api/parse", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setParseError(data.error || "Failed to parse");
-        return;
-      }
-      if (data.title && !title) setTitle(data.title);
-      if (data.description && !description) setDescription(data.description);
-      if (data.category) setCategory(data.category);
-      if (data.ingredients?.length) setIngredients(data.ingredients);
-      if (data.steps?.length) setSteps(data.steps);
-      if (data.notes) setNotes(data.notes);
-      setParseMode(null);
-      setParseInput("");
-    } catch {
-      setParseError("Something went wrong");
-    } finally {
-      setParsing(false);
-    }
-  };
-
-  const handleParseUrl = () => parseRecipe({ text: `Please parse this recipe from URL: ${parseInput}`, imageUrl: parseInput.match(/\.(jpg|jpeg|png|gif|webp)/i) ? parseInput : "" });
-  const handleParseText = () => parseRecipe({ text: parseInput });
-  const handleParsePhoto = async (file: File) => {
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = (reader.result as string).split(",")[1];
-      const mediaType = file.type;
-      await parseRecipe({ imageBase64: base64, imageMediaType: mediaType });
-    };
-    reader.readAsDataURL(file);
-  };
 
   const updateIngredient = (i: number, field: keyof Ingredient, val: string) => {
     setIngredients((prev) => prev.map((ing, idx) => idx === i ? { ...ing, [field]: val } : ing));
@@ -171,109 +117,6 @@ export default function RecipeForm({ initial, recipeId }: Props) {
 
   return (
     <form onSubmit={handleSave} className="space-y-6 pb-8">
-      {/* AI Parse section */}
-      <div
-        className="rounded-2xl border overflow-hidden"
-        style={{ borderColor: "var(--border)", background: "var(--card)" }}
-      >
-        <div className="p-4 border-b" style={{ borderColor: "var(--border)" }}>
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles size={16} style={{ color: "var(--rose)" }} />
-            <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-              Import with AI
-            </span>
-          </div>
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-            Upload a photo, paste a URL, or paste text to auto-fill the recipe fields.
-          </p>
-        </div>
-        <div className="flex divide-x" style={{ borderColor: "var(--border)" }}>
-          {(["photo", "url", "text"] as ParseMode[]).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => setParseMode(parseMode === mode ? null : mode)}
-              className="flex-1 flex flex-col items-center gap-1 py-3 text-xs font-medium transition-colors"
-              style={{
-                background: parseMode === mode ? "var(--rose-light)" : "transparent",
-                color: parseMode === mode ? "var(--text)" : "var(--text-muted)",
-              }}
-            >
-              {mode === "photo" && <Camera size={16} />}
-              {mode === "url" && <Link2 size={16} />}
-              {mode === "text" && <Type size={16} />}
-              {mode === "photo" ? "Photo" : mode === "url" ? "URL / Link" : "Paste text"}
-            </button>
-          ))}
-        </div>
-
-        {parseMode && (
-          <div className="p-4 border-t" style={{ borderColor: "var(--border)" }}>
-            {parseMode === "photo" && (
-              <div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleParsePhoto(file);
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  disabled={parsing}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed text-sm"
-                  style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-                >
-                  {parsing ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-                  {parsing ? "Parsing..." : "Take photo or choose from library"}
-                </button>
-              </div>
-            )}
-
-            {(parseMode === "url" || parseMode === "text") && (
-              <div className="space-y-2">
-                {parseMode === "url" ? (
-                  <input
-                    value={parseInput}
-                    onChange={(e) => setParseInput(e.target.value)}
-                    placeholder="Paste a recipe URL or image URL..."
-                    className="w-full text-sm px-3 py-2 rounded-xl border outline-none"
-                    style={inputStyle}
-                  />
-                ) : (
-                  <textarea
-                    value={parseInput}
-                    onChange={(e) => setParseInput(e.target.value)}
-                    placeholder="Paste the recipe text here..."
-                    rows={5}
-                    className="w-full text-sm px-3 py-2 rounded-xl border outline-none resize-none"
-                    style={inputStyle}
-                  />
-                )}
-                {parseError && (
-                  <p className="text-xs" style={{ color: "#e05050" }}>{parseError}</p>
-                )}
-                <button
-                  type="button"
-                  onClick={parseMode === "url" ? handleParseUrl : handleParseText}
-                  disabled={parsing || !parseInput.trim()}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white disabled:opacity-50"
-                  style={{ background: "var(--rose)" }}
-                >
-                  {parsing && <Loader2 size={14} className="animate-spin" />}
-                  {parsing ? "Parsing..." : "Parse Recipe"}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
       {/* Recipe type */}
       <div>
         <label className="text-xs font-medium mb-2 block" style={labelStyle}>Recipe type</label>
