@@ -1,4 +1,4 @@
-export type RecipeType = "original" | "adapted" | "reference" | "saved";
+export type RecipeType = "recipe" | "inspiration";
 export type RecipeCategory =
   | "breakfast"
   | "lunch"
