@@ -16,11 +16,11 @@ import {
 
 const CATEGORIES: { value: IdeaCategory | ""; label: string; color: string; bg: string }[] = [
   { value: "", label: "All", color: "var(--text-muted)", bg: "var(--border)" },
-  { value: "flavor-combo", label: "Flavor combo", color: "#7055b0", bg: "var(--lavender-light)" },
-  { value: "technique", label: "Technique", color: "#5a9a52", bg: "var(--sage-light)" },
-  { value: "ingredient", label: "Ingredient", color: "#c07830", bg: "var(--peach-light)" },
-  { value: "dish-idea", label: "Dish idea", color: "#c44070", bg: "var(--rose-light)" },
-  { value: "other", label: "Other", color: "#4090b0", bg: "var(--sky-light)" },
+  { value: "flavor-combo", label: "Flavor combo", color: "#7a82b0", bg: "var(--lavender-light)" },
+  { value: "technique", label: "Technique", color: "#4a9278", bg: "var(--sage-light)" },
+  { value: "ingredient", label: "Ingredient", color: "#7a8fa6", bg: "var(--neutral-light)" },
+  { value: "dish-idea", label: "Dish idea", color: "#5a82a0", bg: "var(--sky-light)" },
+  { value: "other", label: "Other", color: "var(--text-muted)", bg: "var(--border)" },
 ];
 
 const CAT_MAP = Object.fromEntries(CATEGORIES.map((c) => [c.value, c]));

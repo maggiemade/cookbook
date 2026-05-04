@@ -34,15 +34,15 @@ const TYPES: { value: RecipeType | ""; label: string }[] = [
 ];
 
 const TYPE_COLORS: Record<RecipeType, string> = {
-  original: "#5a9a52",
-  adapted: "#c07830",
-  reference: "#4090b0",
-  saved: "#7055b0",
+  original: "#4a9278",
+  adapted: "#7a8fa6",
+  reference: "#5a82a0",
+  saved: "#7a82b0",
 };
 
 const TYPE_BG: Record<RecipeType, string> = {
   original: "var(--sage-light)",
-  adapted: "var(--peach-light)",
+  adapted: "var(--neutral-light)",
   reference: "var(--sky-light)",
   saved: "var(--lavender-light)",
 };
@@ -124,8 +124,8 @@ export default function RecipesPage() {
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors"
             style={{
-              borderColor: showFilters ? "var(--rose)" : "var(--border)",
-              background: showFilters ? "var(--rose-light)" : "var(--card)",
+              borderColor: showFilters ? "var(--primary)" : "var(--border)",
+              background: showFilters ? "var(--primary-light)" : "var(--card)",
               color: "var(--text)",
             }}
           >
@@ -142,8 +142,8 @@ export default function RecipesPage() {
               onClick={() => setCategory(c.value as RecipeCategory | "")}
               className="shrink-0 px-3 py-1 rounded-full text-xs font-medium border transition-colors"
               style={{
-                borderColor: category === c.value ? "var(--rose)" : "var(--border)",
-                background: category === c.value ? "var(--rose-light)" : "var(--card)",
+                borderColor: category === c.value ? "var(--primary)" : "var(--border)",
+                background: category === c.value ? "var(--primary-light)" : "var(--card)",
                 color: category === c.value ? "var(--text)" : "var(--text-muted)",
               }}
             >
@@ -237,7 +237,7 @@ export default function RecipesPage() {
             <Link
               href="/recipes/new"
               className="px-4 py-2 rounded-full text-sm font-medium text-white"
-              style={{ background: "var(--rose)" }}
+              style={{ background: "var(--primary)" }}
             >
               Add a Recipe
             </Link>

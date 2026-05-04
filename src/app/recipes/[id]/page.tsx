@@ -17,7 +17,7 @@ import { Recipe, RecipeType } from "@/types";
 
 const TYPE_BG: Record<RecipeType, string> = {
   original: "var(--sage-light)",
-  adapted: "var(--peach-light)",
+  adapted: "var(--neutral-light)",
   reference: "var(--sky-light)",
   saved: "var(--lavender-light)",
 };
@@ -62,7 +62,7 @@ export default function RecipeDetailPage({
       <div className="flex flex-col min-h-dvh">
         <Nav />
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--rose)" }} />
+          <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--primary)" }} />
         </div>
       </div>
     );
@@ -246,7 +246,7 @@ export default function RecipeDetailPage({
                   >
                     <span
                       className="text-sm font-medium w-16 shrink-0 text-right"
-                      style={{ color: "var(--rose)" }}
+                      style={{ color: "var(--primary)" }}
                     >
                       {ing.amount} {ing.unit}
                     </span>
@@ -275,7 +275,7 @@ export default function RecipeDetailPage({
                   <div key={i} className="flex gap-3">
                     <span
                       className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold"
-                      style={{ background: "var(--rose-light)", color: "var(--rose)" }}
+                      style={{ background: "var(--primary-light)", color: "var(--primary)" }}
                     >
                       {step.order}
                     </span>
@@ -307,7 +307,7 @@ export default function RecipeDetailPage({
           {recipe.my_notes && (
             <div
               className="rounded-2xl p-4"
-              style={{ background: "var(--peach-light)" }}
+              style={{ background: "var(--neutral-light)" }}
             >
               <h3 className="text-sm font-semibold mb-2" style={{ color: "var(--text)" }}>
                 ✏️ My notes & edits
