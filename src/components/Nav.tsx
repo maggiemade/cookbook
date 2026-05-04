@@ -20,16 +20,15 @@ export default function Nav() {
         className="sticky top-0 z-40 flex items-center justify-between px-4 py-3 border-b"
         style={{ background: "var(--card)", borderColor: "var(--border)" }}
       >
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl">🍳</span>
-          <span className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-            My Cookbook
+        <Link href="/">
+          <span className="text-lg font-semibold tracking-tight" style={{ color: "var(--text)" }}>
+            MaggieMade Cookbook
           </span>
         </Link>
         <Link
           href="/recipes/new"
           className="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium text-white transition-opacity hover:opacity-80"
-          style={{ background: "var(--rose)" }}
+          style={{ background: "var(--primary)" }}
         >
           <PlusCircle size={15} />
           <span>Add</span>
@@ -48,7 +47,7 @@ export default function Nav() {
               key={href}
               href={href}
               className="flex-1 flex flex-col items-center gap-0.5 py-2 text-xs font-medium transition-colors"
-              style={{ color: active ? "var(--rose)" : "var(--text-muted)" }}
+              style={{ color: active ? "var(--primary)" : "var(--text-muted)" }}
             >
               <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
               {label}
